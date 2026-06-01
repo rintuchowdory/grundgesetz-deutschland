@@ -85,11 +85,12 @@ export default function GrundgesetzApp() {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="bg-ink text-parchment-light border-b-4 border-gold px-4 py-3 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="bg-ink text-parchment-light px-4 py-3 flex items-center justify-between flex-shrink-0 relative">
+        <div className="flag-accent absolute inset-0 pointer-events-none" />
+        <div className="flex items-center gap-3 relative z-10">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="md:hidden text-gold hover:text-gold-light"
+            className="md:hidden text-gold hover:text-gold-light transition-colors"
           >
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -100,7 +101,7 @@ export default function GrundgesetzApp() {
             <p className="text-xs text-gold tracking-widest font-mono">Deutsches Verfassungsrecht · KI-Assistent</p>
           </div>
         </div>
-        <div className="text-xs text-parchment-light font-mono tracking-widest">
+        <div className="text-xs text-parchment-light font-mono tracking-widest relative z-10">
           {user?.name || "Benutzer"}
         </div>
       </header>
@@ -110,17 +111,17 @@ export default function GrundgesetzApp() {
         <aside
           className={`${
             sidebarOpen ? "w-64" : "w-0"
-          } md:w-64 bg-ink border-r-2 border-gold flex flex-col overflow-hidden transition-all duration-300 flex-shrink-0`}
+          } md:w-64 bg-gradient-to-b from-ink to-ink/95 border-r-4 border-red-accent flex flex-col overflow-hidden transition-all duration-300 flex-shrink-0`}
         >
           {/* Search */}
-          <div className="p-4 border-b border-gold/30">
-            <p className="text-xs text-gold tracking-widest font-mono mb-2 uppercase">Artikel durchsuchen</p>
+          <div className="p-4 border-b-2 border-red-accent/50 bg-ink/80">
+            <p className="text-xs text-gold tracking-widest font-mono mb-2 uppercase font-bold">Artikel durchsuchen</p>
             <Input
               type="text"
               placeholder="Artikel suchen…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="bg-ink/50 border-gold/50 text-parchment-light placeholder:text-muted-foreground"
+              className="bg-ink/50 border-2 border-gold/70 text-parchment-light placeholder:text-muted-foreground focus:border-red-accent focus:ring-red-accent"
             />
           </div>
 
@@ -141,8 +142,8 @@ export default function GrundgesetzApp() {
                     }}
                     className={`w-full text-left px-4 py-3 border-b border-ink/50 transition-colors ${
                       selectedArticle?.id === article.id
-                        ? "bg-ink/80 border-l-4 border-gold text-gold-light"
-                        : "text-parchment-light hover:bg-ink/50"
+                  ? "bg-ink/80 border-l-4 border-red-accent text-gold-light shadow-md"
+                  : "text-parchment-light hover:bg-ink/50 hover:border-l-4 hover:border-red-accent/50"
                     }`}
                   >
                     <div className="text-xs font-mono text-gold mb-1">{article.number}</div>
@@ -157,7 +158,7 @@ export default function GrundgesetzApp() {
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Article Panel */}
-          <div className="bg-parchment-light border-b-2 border-border flex-shrink-0 overflow-y-auto max-h-64 p-6">
+          <div className="bg-gradient-to-b from-parchment-light to-parchment flex-shrink-0 overflow-y-auto max-h-64 p-6 border-b-4 border-red-accent/30 shadow-md">
             {selectedArticle ? (
               <div>
                 <p className="text-xs text-muted-foreground tracking-widest font-mono mb-2 uppercase">
@@ -169,7 +170,7 @@ export default function GrundgesetzApp() {
                 >
                   {selectedArticle.number} — {selectedArticle.title}
                 </h2>
-                <span className="inline-block bg-red-state text-parchment-light text-xs px-3 py-1 font-mono tracking-widest mb-4">
+                <span className="inline-block bg-gradient-to-r from-german-red to-red-accent text-parchment-light text-xs px-4 py-2 font-mono tracking-widest mb-4 rounded shadow-md font-bold">
                   {selectedArticle.category}
                 </span>
                 <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
@@ -183,8 +184,7 @@ export default function GrundgesetzApp() {
                       setCurrentConversationId(-1); // Temporary ID, will be replaced
                     }
                   }}
-                  className="mt-4 bg-ink text-gold border border-gold hover:bg-ink/80"
-                  variant="outline"
+                  className="mt-4 bg-gradient-to-r from-german-red to-red-accent text-parchment-light border-0 hover:from-red-accent hover:to-german-red shadow-md font-bold"
                 >
                   Diese Artikel befragen →
                 </Button>
@@ -301,12 +301,12 @@ function ChatInterface({
   return (
     <div className="flex flex-col h-full bg-parchment">
       {/* Suggested questions */}
-      <div className="px-6 py-3 border-b border-border flex flex-wrap gap-2">
+      <div className="px-6 py-3 border-b-2 border-red-accent/30 bg-gradient-to-r from-parchment via-parchment to-parchment-light flex flex-wrap gap-2 shadow-sm">
         {suggestedQuestions.map((q, i) => (
           <button
             key={i}
             onClick={() => handleSendMessage(q)}
-            className="text-xs px-3 py-1 border border-border rounded hover:bg-parchment-light text-muted-foreground hover:text-foreground transition-colors italic"
+            className="text-xs px-3 py-1 border-2 border-red-accent/50 rounded hover:bg-red-accent hover:text-parchment-light text-muted-foreground hover:border-red-accent transition-all italic font-medium"
           >
             {q}
           </button>

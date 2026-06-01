@@ -43,14 +43,18 @@
 }
 
 :root {
-  /* Parchment-and-gold editorial theme */
-  --ink: oklch(0.1 0.01 65);
+  /* German flag colors with parchment theme */
+  --german-black: oklch(0.08 0.01 65);
+  --german-red: oklch(0.55 0.25 15);
+  --german-gold: oklch(0.62 0.18 70);
+  --ink: var(--german-black);
   --parchment: oklch(0.96 0.01 65);
   --parchment-light: oklch(0.98 0.005 65);
   --parchment-dark: oklch(0.88 0.015 65);
-  --gold: oklch(0.6 0.15 70);
-  --gold-light: oklch(0.75 0.12 70);
-  --gold-dark: oklch(0.5 0.18 70);
+  --gold: var(--german-gold);
+  --gold-light: oklch(0.75 0.15 70);
+  --gold-dark: oklch(0.52 0.20 70);
+  --red-accent: var(--german-red);
   --border-muted: oklch(0.85 0.01 65);
   
   --primary: var(--gold);
@@ -89,14 +93,15 @@
 }
 
 .dark {
-  /* Dark parchment-and-gold theme */
+  /* Dark theme with German flag accent colors */
   --ink: oklch(0.95 0.005 65);
-  --parchment: oklch(0.15 0.01 65);
-  --parchment-light: oklch(0.2 0.01 65);
-  --parchment-dark: oklch(0.1 0.01 65);
-  --gold: oklch(0.65 0.15 70);
-  --gold-light: oklch(0.75 0.12 70);
-  --gold-dark: oklch(0.5 0.18 70);
+  --parchment: oklch(0.12 0.01 65);
+  --parchment-light: oklch(0.18 0.01 65);
+  --parchment-dark: oklch(0.08 0.01 65);
+  --gold: var(--german-gold);
+  --gold-light: oklch(0.75 0.15 70);
+  --gold-dark: oklch(0.52 0.20 70);
+  --red-accent: var(--german-red);
   --border-muted: oklch(0.25 0.01 65);
   
   --primary: var(--gold);
@@ -142,6 +147,38 @@
   code, pre, .monospace {
     font-family: 'JetBrains Mono', monospace;
   }
+}
+
+/* German flag stripe styling */
+@layer components {
+  .flag-stripe {
+    background: linear-gradient(to right, 
+      var(--german-black) 0%, 
+      var(--german-black) 33.33%, 
+      var(--german-red) 33.33%, 
+      var(--german-red) 66.66%, 
+      var(--german-gold) 66.66%, 
+      var(--german-gold) 100%);
+  }
+  
+  .flag-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, 
+      var(--german-black) 0%, 
+      var(--german-black) 33.33%, 
+      var(--german-red) 33.33%, 
+      var(--german-red) 66.66%, 
+      var(--german-gold) 66.66%, 
+      var(--german-gold) 100%);
+  }
+}
+
+@layer base {
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [type="button"]:not(:disabled),
