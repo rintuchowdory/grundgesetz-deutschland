@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, articles, conversations, messages, InsertMessage, InsertConversation } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,106 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ===== Articles =====
+export async function getAllArticles() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(articles);
+  } catch (error) {
+    console.error("[Database] Failed to get articles:", error);
+    return [];
+  }
+}
+
+export async function getArticleById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  try {
+    const result = await db.select().from(articles).where(eq(articles.id, id)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get article:", error);
+    return undefined;
+  }
+}
+
+export async function getArticlesByCategory(category: string) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(articles).where(eq(articles.category, category));
+  } catch (error) {
+    console.error("[Database] Failed to get articles by category:", error);
+    return [];
+  }
+}
+
+// ===== Conversations =====
+export async function getUserConversations(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(conversations)
+      .where(eq(conversations.userId, userId))
+      .orderBy(desc(conversations.updatedAt));
+  } catch (error) {
+    console.error("[Database] Failed to get user conversations:", error);
+    return [];
+  }
+}
+
+export async function createConversation(data: InsertConversation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  try {
+    await db.insert(conversations).values(data);
+    // Fetch the created conversation
+    const result = await db.select().from(conversations)
+      .where(eq(conversations.userId, data.userId))
+      .orderBy(desc(conversations.createdAt))
+      .limit(1);
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to create conversation:", error);
+    throw error;
+  }
+}
+
+export async function getConversationById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  try {
+    const result = await db.select().from(conversations).where(eq(conversations.id, id)).limit(1);
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Failed to get conversation:", error);
+    return undefined;
+  }
+}
+
+// ===== Messages =====
+export async function getConversationMessages(conversationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    return await db.select().from(messages)
+      .where(eq(messages.conversationId, conversationId))
+      .orderBy(messages.createdAt);
+  } catch (error) {
+    console.error("[Database] Failed to get conversation messages:", error);
+    return [];
+  }
+}
+
+export async function addMessage(data: InsertMessage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  try {
+    const result = await db.insert(messages).values(data);
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to add message:", error);
+    throw error;
+  }
+}

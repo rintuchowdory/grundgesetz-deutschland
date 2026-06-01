@@ -1,5 +1,20 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1780354378436,
+      "tag": "0000_medical_puff_adder",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1780354540321,
+      "tag": "0001_silent_spectrum",
+      "breakpoints": true
+    }
+  ]
 }
