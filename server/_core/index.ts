@@ -36,12 +36,27 @@ async function startServer() {
   const allowedOrigins = new Set(
     (process.env.FRONTEND_ORIGIN ?? "")
       .split(",")
-      .map(origin => origin.trim().replace(/\/$/, ""))
+      .map(origin => origin.trim())
       .filter(Boolean)
+      .map(origin => {
+        try {
+          return new URL(origin).origin;
+        } catch {
+          return origin.replace(/\/$/, "");
+        }
+      })
   );
   app.use((req, res, next) => {
     const requestOrigin = req.headers.origin;
-    if (requestOrigin && allowedOrigins.has(requestOrigin.replace(/\/$/, ""))) {
+    let normalizedRequestOrigin: string | undefined;
+    if (requestOrigin) {
+      try {
+        normalizedRequestOrigin = new URL(requestOrigin).origin;
+      } catch {
+        normalizedRequestOrigin = requestOrigin.replace(/\/$/, "");
+      }
+    }
+    if (requestOrigin && normalizedRequestOrigin && allowedOrigins.has(normalizedRequestOrigin)) {
       res.setHeader("Access-Control-Allow-Origin", requestOrigin);
       res.setHeader("Access-Control-Allow-Credentials", "true");
       res.setHeader("Vary", "Origin");
