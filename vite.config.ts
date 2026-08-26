@@ -150,7 +150,26 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+function vitePluginStripUnconfiguredAnalytics() {
+  return {
+    name: "strip-unconfigured-analytics",
+    transformIndexHtml(html: string) {
+      if (process.env.VITE_ANALYTICS_ENDPOINT && process.env.VITE_ANALYTICS_WEBSITE_ID) {
+        return html;
+      }
+      return html.replace(/\s*<script[^>]*VITE_ANALYTICS_ENDPOINT[^>]*>\s*<\/script>/, "");
+    },
+  };
+}
+
+const plugins = [
+  react(),
+  tailwindcss(),
+  jsxLocPlugin(),
+  vitePluginManusRuntime(),
+  vitePluginManusDebugCollector(),
+  vitePluginStripUnconfiguredAnalytics(),
+];
 
 export default defineConfig({
   plugins,
