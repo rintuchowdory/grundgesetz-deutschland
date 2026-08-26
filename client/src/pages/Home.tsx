@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { Streamdown } from "streamdown";
+import { trpc } from "@/lib/trpc";
 
 const heroImage = "/manus-storage/verfassungsblatt-hero_52fa1064.png";
 const archiveImage = "/manus-storage/verfassungsblatt-archive_d78ab496.png";
@@ -67,6 +69,19 @@ export default function Home() {
   const [answer, setAnswer] = useState(answers["Art. 5 GG"]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState<string | null>(null);
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [localError, setLocalError] = useState("");
+  const askMutation = trpc.ai.ask.useMutation({
+    onSuccess: (data) => {
+      setAiAnswer(data.answer);
+      setAiQuestion(data.question);
+      setLocalError("");
+    },
+    onError: (error) => {
+      setLocalError(error.message);
+    },
+  });
 
   const scrollToAnswer = () => {
     window.setTimeout(() => {
@@ -76,21 +91,25 @@ export default function Home() {
 
   const askQuestion = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const normalized = query.toLowerCase();
-    const match = normalized.includes("gleich")
-      ? examples[1]
-      : normalized.includes("staats") || normalized.includes("20")
-        ? examples[2]
-        : examples[0];
-    setActiveExample(match);
-    setAnswer(answers[match.article]);
+    const trimmedQuestion = query.trim();
+    if (trimmedQuestion.length < 3) {
+      setLocalError("Bitte formuliere eine etwas ausführlichere Frage.");
+      return;
+    }
+    setLocalError("");
+    setAiAnswer(null);
+    setAiQuestion(trimmedQuestion);
     setHasSearched(true);
+    askMutation.mutate({ question: trimmedQuestion });
     scrollToAnswer();
   };
 
   const chooseExample = (example: (typeof examples)[number]) => {
     setActiveExample(example);
     setAnswer(answers[example.article]);
+    setAiAnswer(null);
+    setAiQuestion("");
+    setLocalError("");
     setQuery(example.question);
     setHasSearched(true);
     scrollToAnswer();
@@ -133,10 +152,11 @@ export default function Home() {
             <label htmlFor="question">Deine Frage zum Grundgesetz</label>
             <div className="question-input-wrap">
               <Search size={20} aria-hidden="true" />
-              <input id="question" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Was bedeutet Artikel 5?" />
-              <button type="submit" aria-label="Frage untersuchen"><ArrowUpRight size={21} /></button>
+              <input id="question" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Was bedeutet Artikel 5?" aria-describedby="question-note" />
+              <button type="submit" aria-label="Frage untersuchen" disabled={askMutation.isPending}><ArrowUpRight size={21} /></button>
             </div>
-            <p className="form-note"><span className="red-line" /> Keine Rechtsberatung · Antworten immer an der Quelle prüfen</p>
+            <p className="form-note" id="question-note"><span className="red-line" /> Manus KI · keine Rechtsberatung · Quellen immer prüfen</p>
+            {localError && <p className="form-error" role="alert">{localError}</p>}
           </form>
         </div>
         <div className="hero-visual" aria-label="Archivisches Gesetzbuch auf einem Lesetisch">
@@ -179,11 +199,17 @@ export default function Home() {
             <div className="answer-meta"><span className="verified-mark"><Check size={13} /></span> Aus dem Wortlaut entwickelt</div>
           </div>
           <article className="answer-card">
-            <div className="answer-card-top"><span>{answer.article}</span><span className="answer-type"><Sparkles size={14} /> KI-Einordnung</span></div>
-            <h3>{answer.title}</h3>
-            <p>{answer.body}</p>
-            <div className="answer-source"><BookOpen size={18} /><div><span>Primärquelle</span><strong>{answer.source}</strong></div><ArrowUpRight size={17} /></div>
-            <div className="answer-card-footer"><span>Frage: „{activeExample.question}“</span><button type="button" onClick={() => document.getElementById("quellen")?.scrollIntoView({ behavior: "smooth" })}>Quellenweg ansehen <ArrowUpRight size={15} /></button></div>
+            <div className="answer-card-top"><span>{aiAnswer ? "Live-Antwort · Manus LLM" : answer.article}</span><span className="answer-type"><Sparkles size={14} /> {aiAnswer ? "serverseitig geschützt" : "Beispiel-Einordnung"}</span></div>
+            {askMutation.isPending ? (
+              <div className="answer-loading" role="status"><span className="loading-pulse" /> Deine Frage wird eingeordnet …</div>
+            ) : aiAnswer ? (
+              <div className="ai-answer-markdown"><Streamdown>{aiAnswer}</Streamdown></div>
+            ) : (
+              <h3>{answer.title}</h3>
+            )}
+            {!aiAnswer && !askMutation.isPending && <p>{answer.body}</p>}
+            <div className="answer-source"><BookOpen size={18} /><div><span>{aiAnswer ? "Quellenhinweis" : "Primärquelle"}</span><strong>{aiAnswer ? "Bitte den genannten Artikel am aktuellen amtlichen Wortlaut prüfen." : answer.source}</strong></div><ArrowUpRight size={17} /></div>
+            <div className="answer-card-footer"><span>Frage: „{aiQuestion || activeExample.question}“</span><button type="button" onClick={() => document.getElementById("quellen")?.scrollIntoView({ behavior: "smooth" })}>Quellenweg ansehen <ArrowUpRight size={15} /></button></div>
           </article>
         </div>
       </section>
