@@ -20,7 +20,10 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec vite build --base=/grundgesetz-gpt/
+      - name: Build frontend
+        env:
+          VITE_API_BASE_URL: https://grundgesetzgpt-api.onrender.com
+        run: pnpm exec vite build --base=/grundgesetz-gpt/
       - run: cp dist/public/index.html dist/public/404.html
       - name: Publish generated frontend into the configured Pages root
         run: |
