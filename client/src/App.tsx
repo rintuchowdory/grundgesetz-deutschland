@@ -1,20 +1,24 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Router as WouterRouter, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import GrundgesetzApp from "./pages/GrundgesetzApp";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
+  // GitHub Pages serves this app below the repository base path.
+  // Wouter must receive the same base so `/grundgesetz-gpt/` matches `/`.
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
   return (
-    <Switch>
+    <WouterRouter base={basePath}>
+      <Switch>
       <Route path="/" component={GrundgesetzApp} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+        <Route component={NotFound} />
+      </Switch>
+    </WouterRouter>
   );
 }
 
