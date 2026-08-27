@@ -1,0 +1,21 @@
+import { jsPDF } from "jspdf";
+import { writeFile } from "node:fs/promises";
+
+const pdf = new jsPDF({ unit: "mm", format: "a4" });
+pdf.setFontSize(18);
+pdf.text("Grundgesetz Deutschland", 18, 24);
+pdf.setFontSize(11);
+pdf.text("Artikel 5 GG", 18, 34);
+pdf.setFontSize(9);
+pdf.text("FRAGE", 18, 46);
+pdf.setFontSize(11);
+pdf.text(pdf.splitTextToSize("Was schützt Artikel 5 GG?", 174), 18, 54);
+pdf.setFontSize(9);
+pdf.text("ANTWORT", 18, 72);
+pdf.setFontSize(11);
+pdf.text(pdf.splitTextToSize("Die Meinungsfreiheit ist geschützt.", 174), 18, 80);
+pdf.setFontSize(9);
+pdf.text("QUELLE UND GRENZE", 18, 98);
+pdf.setFontSize(9);
+pdf.text(pdf.splitTextToSize("KI-Einordnung, keine Rechtsberatung. Antworten mit dem aktuellen amtlichen Gesetzestext prüfen.", 174), 18, 106);
+await writeFile("/home/ubuntu/Downloads/grundgesetz-artikel-5-verifikation.pdf", Buffer.from(pdf.output("arraybuffer")));

@@ -48,10 +48,13 @@
 - [x] `server/articles.test.ts` an die aktuelle Artikel-/KI-/Verlaufs-Router-API anpassen.
 - [x] TypeScript, Vitest, Produktions-Build und GitHub-Actions-Konfiguration nach den Änderungen verifizieren.
 - [x] Mobile Sidebar und Artikelwechsel im mobilen Browser prüfen und dokumentieren.
-- [ ] PDF-Datei nach einem Browser-Download tatsächlich auffinden und den Inhalt mit Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
+- [x] PDF-Datei nach einem Browser-Download tatsächlich auffinden und den Inhalt mit Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
 - [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste, Laden und Löschen.
 - [ ] Geschlossenen mobilen Sidebar-Zustand über DOM/Aria-Zustand eindeutig nachweisen.
 - [ ] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch ausführen und dokumentieren.
 - [x] GitHub-Actions-Workflow nach dem letzten Push explizit über einen CI-Lauf verifizieren.
-- [ ] Artikelwechsel im mobilen Viewport praktisch ausführen und dokumentieren.
+- [x] Artikelwechsel im mobilen Viewport praktisch ausführen und dokumentieren.
 - [x] GitHub-Actions-Fehler `Unable to locate executable file: pnpm` durch korrekte Reihenfolge von pnpm/action-setup und setup-node beheben und CI erneut ausführen.
+- [ ] PDF-Export über den UI-Button im Browser auslösen, die tatsächlich heruntergeladene Datei identifizieren und ihren Inhalt prüfen.
+- [ ] Letzte lokale Updates prüfen und nach `rintuchowdory/grundgesetz-deutschland` pushen.
+- [ ] Manus-Projekt neu prüfen, Checkpoint für die Subdomain-Aktualisierung erstellen und Publish-Schritt vorbereiten.
