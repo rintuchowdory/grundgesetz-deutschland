@@ -15,9 +15,13 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Streamdown } from "streamdown";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
+import { downloadConversationPdf } from "@/lib/conversation-export";
+import { articleCatalog, articleSections, officialGrundgesetzUrl, type ArticleEntry } from "@/lib/article-catalog";
 
 const heroImage = "/manus-storage/verfassungsblatt-hero_52fa1064.png";
 const archiveImage = "/manus-storage/verfassungsblatt-archive_d78ab496.png";
@@ -41,6 +45,10 @@ const examples = [
     question: "Welche Staatsprinzipien stehen in Artikel 20?",
   },
 ];
+
+type ChatMessage = { role: "user" | "assistant"; content: string };
+
+
 
 const answers: Record<string, { article: string; title: string; body: string; source: string }> = {
   "Art. 5 GG": {
@@ -68,14 +76,74 @@ export default function Home() {
   const [activeExample, setActiveExample] = useState(examples[0]);
   const [answer, setAnswer] = useState(answers["Art. 5 GG"]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [articleSidebarOpen, setArticleSidebarOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<ArticleEntry>(articleCatalog[0]);
   const [hasSearched, setHasSearched] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState("");
   const [localError, setLocalError] = useState("");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [saveNotice, setSaveNotice] = useState("");
+  const [selectedHistoryId, setSelectedHistoryId] = useState<number | null>(null);
+  const [localHistory, setLocalHistory] = useState<Array<{ title: string; messages: ChatMessage[]; savedAt: string }>>([]);
+  const { isAuthenticated, user } = useAuth();
+  const historyQuery = trpc.history.list.useQuery(undefined, { enabled: isAuthenticated });
+  const saveHistoryMutation = trpc.history.save.useMutation({
+    onSuccess: () => {
+      setSaveNotice("Unterhaltung sicher im persönlichen Verlauf gespeichert.");
+      historyQuery.refetch();
+    },
+    onError: () => setSaveNotice("Server-Speicherung benötigt eine aktive Anmeldung. Die Unterhaltung bleibt lokal verfügbar."),
+  });
+  const loadedHistoryQuery = trpc.history.get.useQuery(
+    { id: selectedHistoryId ?? 0 },
+    { enabled: selectedHistoryId !== null && isAuthenticated },
+  );
+  const removeHistoryMutation = trpc.history.remove.useMutation({
+    onSuccess: () => {
+      setSelectedHistoryId(null);
+      historyQuery.refetch();
+    },
+  });
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("grundgesetz-chat-latest");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { title: string; messages: ChatMessage[]; savedAt: string } | Array<{ title: string; messages: ChatMessage[]; savedAt: string }>;
+        const savedItems = Array.isArray(parsed) ? parsed : [parsed];
+        setLocalHistory(savedItems.filter(item => item?.title && Array.isArray(item.messages)).slice(0, 10));
+      }
+    } catch {
+      setLocalHistory([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!articleSidebarOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setArticleSidebarOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [articleSidebarOpen]);
+
+  useEffect(() => {
+    const saved = loadedHistoryQuery.data;
+    if (!saved) return;
+    const messages = saved.messages.map(message => ({ role: message.role, content: message.content }));
+    const lastQuestion = [...messages].reverse().find(message => message.role === "user");
+    const lastAnswer = [...messages].reverse().find(message => message.role === "assistant");
+    setChatMessages(messages);
+    setAiQuestion(lastQuestion?.content || saved.title);
+    setAiAnswer(lastAnswer?.content || null);
+    setHasSearched(true);
+    setSaveNotice("Gespeicherte Unterhaltung geladen.");
+  }, [loadedHistoryQuery.data]);
   const askMutation = trpc.ai.ask.useMutation({
     onSuccess: (data) => {
       setAiAnswer(data.answer);
       setAiQuestion(data.question);
+      setChatMessages([{ role: "user", content: data.question }, { role: "assistant", content: data.answer }]);
       setLocalError("");
     },
     onError: (error) => {
@@ -104,10 +172,68 @@ export default function Home() {
     scrollToAnswer();
   };
 
+  const currentMessages = useMemo<ChatMessage[]>(() => {
+    if (chatMessages.length > 0) return chatMessages;
+    return [{ role: "user", content: aiQuestion || activeExample.question }, { role: "assistant", content: `${answer.title}\n\n${answer.body}` }];
+  }, [activeExample.question, aiQuestion, answer.body, answer.title, chatMessages]);
+
+  const saveConversation = () => {
+    const title = (currentMessages.find(message => message.role === "user")?.content || "Grundgesetz-Gespräch").slice(0, 180);
+    const savedConversation = { title, messages: currentMessages, savedAt: new Date().toISOString() };
+    const nextLocalHistory = [savedConversation, ...localHistory.filter(item => item.title !== title)].slice(0, 10);
+    localStorage.setItem("grundgesetz-chat-latest", JSON.stringify(nextLocalHistory));
+    setLocalHistory(nextLocalHistory);
+    if (isAuthenticated) {
+      saveHistoryMutation.mutate({ title, messages: currentMessages });
+      return;
+    }
+    setSaveNotice("Lokal in diesem Browser gespeichert. Für geräteübergreifenden Verlauf bitte anmelden.");
+  };
+
+  const downloadPdf = () => {
+    const title = (currentMessages.find(message => message.role === "user")?.content || "Grundgesetz-Gespräch").slice(0, 180);
+    downloadConversationPdf(title, currentMessages);
+  };
+
+  const loadHistory = (id: number) => {
+    setSelectedHistoryId(id);
+    setSaveNotice("");
+  };
+
+  const loadLocalConversation = (saved: { title: string; messages: ChatMessage[] }) => {
+    const lastQuestion = [...saved.messages].reverse().find(message => message.role === "user");
+    const lastAnswer = [...saved.messages].reverse().find(message => message.role === "assistant");
+    setChatMessages(saved.messages);
+    setAiQuestion(lastQuestion?.content || saved.title);
+    setAiAnswer(lastAnswer?.content || null);
+    setHasSearched(true);
+    setSaveNotice("Lokale Unterhaltung geladen.");
+  };
+
+  const explainArticle = (article: ArticleEntry) => {
+    setSelectedArticle(article);
+    setArticleSidebarOpen(false);
+    const question = `Erkläre ${article.label} GG Schritt für Schritt in einfacher Sprache. Nenne den Verfassungszweck, wichtige Begriffe, mögliche Grenzen und verweise auf den amtlichen Wortlaut.`;
+    setQuery(question);
+    setAiAnswer(null);
+    setAiQuestion(question);
+    setHasSearched(true);
+    setLocalError("");
+    askMutation.mutate({ question });
+    scrollToAnswer();
+  };
+
+  const moveArticle = (direction: -1 | 1) => {
+    const currentIndex = articleCatalog.findIndex(article => article.id === selectedArticle.id);
+    const next = articleCatalog[Math.max(0, Math.min(articleCatalog.length - 1, currentIndex + direction))];
+    if (next) explainArticle(next);
+  };
+
   const chooseExample = (example: (typeof examples)[number]) => {
     setActiveExample(example);
     setAnswer(answers[example.article]);
     setAiAnswer(null);
+    setChatMessages([]);
     setAiQuestion("");
     setLocalError("");
     setQuery(example.question);
@@ -137,11 +263,23 @@ export default function Home() {
         </nav>
         <div className="header-actions">
           <a className="header-link" href="#hinweis">Nutzungshinweis <ArrowUpRight size={15} strokeWidth={1.8} /></a>
+          {isAuthenticated ? <span className="header-user">{user?.name || "Angemeldet"}</span> : <button className="login-link" type="button" onClick={() => startLogin()}>Anmelden <ArrowUpRight size={15} strokeWidth={1.8} /></button>}
           <button className="menu-button" type="button" aria-label={mobileMenuOpen ? "Menü schließen" : "Menü öffnen"} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
+
+      <button className={`article-drawer-toggle ${articleSidebarOpen ? "is-open" : ""}`} type="button" onClick={() => setArticleSidebarOpen(open => !open)} aria-expanded={articleSidebarOpen} aria-controls="article-sidebar"><BookOpen size={15} /> Artikel-Navigation</button>
+      <aside id="article-sidebar" className={`article-sidebar ${articleSidebarOpen ? "is-open" : ""}`} aria-label="Alle Grundgesetz-Artikel">
+        <div className="article-sidebar-top"><span className="section-kicker">Schritt für Schritt</span><strong>Alle Artikel</strong><button type="button" className="article-sidebar-close" onClick={() => setArticleSidebarOpen(false)} aria-label="Artikelnavigation schließen"><X size={16} /></button></div>
+        <p className="article-sidebar-intro">Wähle einen Artikel aus. Die KI erklärt Zweck, Begriffe und Grenzen in verständlicher Sprache.</p>
+        <div className="article-stepper"><button type="button" onClick={() => moveArticle(-1)} disabled={selectedArticle.id === articleCatalog[0].id} aria-label="Vorheriger Artikel">←</button><span>{selectedArticle.label} · {articleCatalog.findIndex(article => article.id === selectedArticle.id) + 1}/{articleCatalog.length}</span><button type="button" onClick={() => moveArticle(1)} disabled={selectedArticle.id === articleCatalog.at(-1)?.id} aria-label="Nächster Artikel">→</button></div>
+        <div className="article-list">
+          {articleSections.map(section => <div className="article-group" key={section}><span className="article-group-title">{section}</span>{articleCatalog.filter(article => article.section === section).map(article => <button type="button" className={`article-item ${selectedArticle.id === article.id ? "is-selected" : ""} ${article.fallen ? "is-fallen" : ""}`} key={article.id} onClick={() => explainArticle(article)}><span>{article.label}</span><em>{article.fallen ? "weggefallen" : article.title}</em></button>)}</div>)}
+        </div>
+        <a className="article-source-link" href={officialGrundgesetzUrl} target="_blank" rel="noreferrer">Amtlichen Wortlaut öffnen <ArrowUpRight size={14} /></a>
+      </aside>
 
       <section className="hero" id="start">
         <div className="hero-copy">
@@ -210,7 +348,41 @@ export default function Home() {
             {!aiAnswer && !askMutation.isPending && <p>{answer.body}</p>}
             <div className="answer-source"><BookOpen size={18} /><div><span>{aiAnswer ? "Quellenhinweis" : "Primärquelle"}</span><strong>{aiAnswer ? "Bitte den genannten Artikel am aktuellen amtlichen Wortlaut prüfen." : answer.source}</strong></div><ArrowUpRight size={17} /></div>
             <div className="answer-card-footer"><span>Frage: „{aiQuestion || activeExample.question}“</span><button type="button" onClick={() => document.getElementById("quellen")?.scrollIntoView({ behavior: "smooth" })}>Quellenweg ansehen <ArrowUpRight size={15} /></button></div>
+            <div className="conversation-actions">
+              <button type="button" onClick={saveConversation} disabled={saveHistoryMutation.isPending}><BookOpen size={15} /> {saveHistoryMutation.isPending ? "Speichert …" : "Verlauf speichern"}</button>
+              <button type="button" onClick={downloadPdf}><ArrowUpRight size={15} /> Als PDF drucken</button>
+            </div>
+            {saveNotice && <p className="save-notice" role="status">{saveNotice}</p>}
           </article>
+          {chatMessages.length > 0 && (
+            <div className="message-thread" aria-label="Aktueller Chatverlauf">
+              {chatMessages.map((message, index) => (
+                <div className={`thread-message ${message.role}`} key={`${message.role}-${index}`}>
+                  <span>{message.role === "user" ? "Deine Frage" : "Grundgesetz GPT"}</span>
+                  <div>{message.role === "assistant" ? <Streamdown>{message.content}</Streamdown> : message.content}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {localHistory.length > 0 && (
+            <aside className="history-panel" aria-label="Lokal gespeicherte Unterhaltung">
+              <div className="history-panel-heading"><span className="section-kicker">Dieser Browser</span><strong>Lokaler Verlauf</strong></div>
+              {localHistory.map((item, index) => <button className="local-history-button" type="button" key={`${item.savedAt}-${index}`} onClick={() => loadLocalConversation(item)}>{item.title}</button>)}
+              <p className="history-loaded">Lokal gespeichert; nur auf diesem Gerät sichtbar.</p>
+            </aside>
+          )}
+          {isAuthenticated && historyQuery.data && historyQuery.data.length > 0 && (
+            <aside className="history-panel" aria-label="Gespeicherte Unterhaltungen">
+              <div className="history-panel-heading"><span className="section-kicker">Persönlicher Verlauf</span><strong>Gespeicherte Gespräche</strong></div>
+              {historyQuery.data.slice(0, 6).map(item => (
+                <div className="history-row" key={item.id}>
+                  <button type="button" onClick={() => loadHistory(item.id)}>{item.title}</button>
+                  <button type="button" aria-label={`${item.title} löschen`} onClick={() => removeHistoryMutation.mutate({ id: item.id })}>×</button>
+                </div>
+              ))}
+              {loadedHistoryQuery.data && <p className="history-loaded">{loadedHistoryQuery.data.messages.length} Nachrichten geladen. Öffne sie über den Verlaufseintrag.</p>}
+            </aside>
+          )}
         </div>
       </section>
 

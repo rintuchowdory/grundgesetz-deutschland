@@ -7,3 +7,31 @@
 - [x] Lade-, Erfolgs- und Fehlerzustände im Browser testen.
 - [x] Prüfen, dass kein API-Schlüssel in Client-Bundle, HTML oder Logs erscheint.
 - [x] Erfolgs-, Lade- und Fehlerpfade der KI-Fragefunktion im Browser tatsächlich ausführen und dokumentiert verifizieren.
+- [x] Datenmodell für private Chatverläufe und Nachrichten mit Nutzerbezug definieren.
+- [x] Endpunkte zum Speichern, Auflisten, Laden und Löschen von Chatverläufen ergänzen.
+- [x] Verlauf im Frontend anzeigen und eine Unterhaltung lokal sowie serverseitig speichern können.
+- [x] PDF-Export mit Fragen, Antworten, Quellenhinweis und Haftungshinweis ergänzen.
+- [x] Tests und Browser-Verifikation für Speichern, Datenschutz und PDF-Export durchführen.
+- [x] Lokale Verlaufsdaten beim Laden aus `localStorage` einlesen und als auswählbare Verlaufsliste anzeigen.
+- [x] Gespeicherte Unterhaltungen als echten Nachrichtenverlauf rendern und beim Laden vollständig anzeigen.
+- [x] Erfolgsfälle für Speichern, Auflisten, Laden und Löschen mit DB-/Mock-Tests abdecken.
+- [x] PDF-Export im Browser tatsächlich ausführen und den erzeugten Inhalt prüfen.
+- [x] Serverseitiges Speichern mit angemeldetem Nutzer im Browser verifizieren.
+- [ ] Lokalen Verlauf als echte Liste mehrerer Unterhaltungen in `localStorage` speichern und auswählbar rendern.
+- [ ] PDF-Export end-to-end verifizieren und Inhalt auf Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
+- [ ] Authentifizierten Verlaufspfad im Browser mit Speichern, Anzeigen, Laden und Löschen verifizieren.
+- [x] Vollständigen Artikelkatalog des Grundgesetzes mit amtlichen Quellen strukturieren.
+- [x] Schrittweise KI-Erklärung für den jeweils ausgewählten Artikel anbinden.
+- [x] Linke Seitenleiste mit Artikelliste, Auswahlzustand und Vor-/Zurück-Navigation bauen.
+- [x] Responsive einklappbare Slider-Navigation für Mobilgeräte ergänzen.
+- [x] Artikelwechsel, KI-Erklärung, Tastaturbedienung und mobile Darstellung testen.
+- [x] Amtliche Kapitelzuordnung korrigieren, insbesondere Art. 104a–104d unter X · Das Finanzwesen.
+- [x] Mobile Seitenleiste und Toggle im mobilen Viewport praktisch testen und korrigieren.
+- [x] Artikel anklicken, KI-Erklärung laden und Vor-/Zurück-Navigation im Browser testen.
+- [x] Tastaturbedienung mit Fokus, Enter/Space und Escape für die Sidebar verifizieren.
+- [x] Mobile Sidebar im echten mobilen Browser-Viewport öffnen, schließen und Toggle-Zustand dokumentieren.
+- [x] Einen Artikel anklicken, KI-Erklärung nachweisen und Vor-/Zurück-Navigation praktisch ausführen.
+- [x] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch verifizieren.
+- [ ] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den Toggle-Zustand dokumentieren.
+- [ ] Artikelauswahl end-to-end verifizieren und einen sichtbaren Wechsel über die Nächster-Artikel-Schaltfläche nachweisen.
+- [ ] Tastaturbedienung mit Fokus, Enter/Space und Escape praktisch testen und dokumentieren.

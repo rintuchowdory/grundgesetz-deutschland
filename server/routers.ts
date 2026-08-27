@@ -5,9 +5,10 @@
 import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { invokeLLM } from "./_core/llm";
+import { createConversation, deleteConversation, getConversation, listConversations } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 
 const recentRequests = new Map<string, number>();
 const REQUEST_COOLDOWN_MS = 5_000;
@@ -92,6 +93,28 @@ export const appRouter = router({
           throw new Error("Die Antwort konnte gerade nicht erstellt werden. Bitte prüfe deine Frage und versuche es erneut.");
         }
       }),
+  }),
+
+  history: router({
+    save: protectedProcedure
+      .input(z.object({
+        title: z.string().trim().min(1).max(180),
+        messages: z.array(z.object({
+          role: z.enum(["user", "assistant"]),
+          content: z.string().trim().min(1).max(20_000),
+        })).min(1).max(40),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const id = await createConversation(ctx.user.id, input.title, input.messages);
+        return { id };
+      }),
+    list: protectedProcedure.query(({ ctx }) => listConversations(ctx.user.id)),
+    get: protectedProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .query(({ ctx, input }) => getConversation(ctx.user.id, input.id)),
+    remove: protectedProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ ctx, input }) => ({ deleted: await deleteConversation(ctx.user.id, input.id) })),
   }),
 });
 
