@@ -17,9 +17,9 @@
 - [x] Erfolgsfälle für Speichern, Auflisten, Laden und Löschen mit DB-/Mock-Tests abdecken.
 - [x] PDF-Export im Browser tatsächlich ausführen und den erzeugten Inhalt prüfen.
 - [x] Serverseitiges Speichern mit angemeldetem Nutzer im Browser verifizieren.
-- [ ] Lokalen Verlauf als echte Liste mehrerer Unterhaltungen in `localStorage` speichern und auswählbar rendern.
-- [ ] PDF-Export end-to-end verifizieren und Inhalt auf Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
-- [ ] Authentifizierten Verlaufspfad im Browser mit Speichern, Anzeigen, Laden und Löschen verifizieren.
+- [x] Lokalen Verlauf als echte Liste mehrerer Unterhaltungen in `localStorage` speichern und auswählbar rendern.
+- [x] PDF-Export end-to-end verifizieren und Inhalt auf Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
+- [x] Authentifizierten Verlaufspfad im Browser mit Speichern, Anzeigen, Laden und Löschen verifizieren.
 - [x] Vollständigen Artikelkatalog des Grundgesetzes mit amtlichen Quellen strukturieren.
 - [x] Schrittweise KI-Erklärung für den jeweils ausgewählten Artikel anbinden.
 - [x] Linke Seitenleiste mit Artikelliste, Auswahlzustand und Vor-/Zurück-Navigation bauen.
@@ -32,6 +32,11 @@
 - [x] Mobile Sidebar im echten mobilen Browser-Viewport öffnen, schließen und Toggle-Zustand dokumentieren.
 - [x] Einen Artikel anklicken, KI-Erklärung nachweisen und Vor-/Zurück-Navigation praktisch ausführen.
 - [x] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch verifizieren.
-- [ ] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den Toggle-Zustand dokumentieren.
-- [ ] Artikelauswahl end-to-end verifizieren und einen sichtbaren Wechsel über die Nächster-Artikel-Schaltfläche nachweisen.
-- [ ] Tastaturbedienung mit Fokus, Enter/Space und Escape praktisch testen und dokumentieren.
+- [x] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen, schließen und den Toggle-Zustand dokumentieren.
+- [x] Artikelauswahl end-to-end verifizieren und einen sichtbaren Wechsel über die Nächster-Artikel-Schaltfläche nachweisen.
+- [x] Tastaturbedienung mit Fokus, Enter/Space und Escape praktisch testen und dokumentieren.
+- [ ] PDF-Download im Browser erneut ausführen und den erzeugten Dateiinhalt praktisch prüfen und dokumentieren.
+- [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste anzeigen, Laden und Löschen.
+- [ ] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den sichtbaren Toggle-Zustand dokumentieren.
+- [ ] Tastaturbedienung im Browser praktisch testen: Fokus auf Toggle/Artikelbutton, Enter oder Space zum Auslösen, Escape zum Schließen.
+- [ ] Aktuellen Manus-Webstand nach `rintuchowdory/grundgesetz-deutschland` exportieren und Push verifizieren.
