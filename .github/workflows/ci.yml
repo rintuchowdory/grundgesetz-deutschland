@@ -23,16 +23,16 @@ jobs:
       - name: Repository auschecken
         uses: actions/checkout@v4
 
+      - name: pnpm einrichten
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+
       - name: Node.js einrichten
         uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
-
-      - name: pnpm einrichten
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.4.1
 
       - name: Abhängigkeiten installieren
         run: pnpm install --frozen-lockfile

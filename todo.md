@@ -54,3 +54,4 @@
 - [ ] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch ausführen und dokumentieren.
 - [ ] GitHub-Actions-Workflow nach dem letzten Push explizit über einen CI-Lauf verifizieren.
 - [ ] Artikelwechsel im mobilen Viewport praktisch ausführen und dokumentieren.
+- [ ] GitHub-Actions-Fehler `Unable to locate executable file: pnpm` durch korrekte Reihenfolge von pnpm/action-setup und setup-node beheben und CI erneut ausführen.
