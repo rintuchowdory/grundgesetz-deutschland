@@ -15,7 +15,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -86,6 +86,7 @@ export default function Home() {
   const [saveNotice, setSaveNotice] = useState("");
   const [selectedHistoryId, setSelectedHistoryId] = useState<number | null>(null);
   const [localHistory, setLocalHistory] = useState<Array<{ title: string; messages: ChatMessage[]; savedAt: string }>>([]);
+  const articleSidebarCloseRef = useRef<HTMLButtonElement>(null);
   const { isAuthenticated, user } = useAuth();
   const historyQuery = trpc.history.list.useQuery(undefined, { enabled: isAuthenticated });
   const saveHistoryMutation = trpc.history.save.useMutation({
@@ -117,6 +118,14 @@ export default function Home() {
       setLocalHistory([]);
     }
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("article-sidebar-open", articleSidebarOpen);
+    if (articleSidebarOpen) {
+      window.setTimeout(() => articleSidebarCloseRef.current?.focus(), 0);
+    }
+    return () => document.body.classList.remove("article-sidebar-open");
+  }, [articleSidebarOpen]);
 
   useEffect(() => {
     if (!articleSidebarOpen) return;
@@ -271,9 +280,10 @@ export default function Home() {
       </header>
 
       <button className={`article-drawer-toggle ${articleSidebarOpen ? "is-open" : ""}`} type="button" onClick={() => setArticleSidebarOpen(open => !open)} aria-expanded={articleSidebarOpen} aria-controls="article-sidebar"><BookOpen size={15} /> Artikel-Navigation</button>
-      <aside id="article-sidebar" className={`article-sidebar ${articleSidebarOpen ? "is-open" : ""}`} aria-label="Alle Grundgesetz-Artikel">
-        <div className="article-sidebar-top"><span className="section-kicker">Schritt für Schritt</span><strong>Alle Artikel</strong><button type="button" className="article-sidebar-close" onClick={() => setArticleSidebarOpen(false)} aria-label="Artikelnavigation schließen"><X size={16} /></button></div>
-        <p className="article-sidebar-intro">Wähle einen Artikel aus. Die KI erklärt Zweck, Begriffe und Grenzen in verständlicher Sprache.</p>
+      <button className={`article-sidebar-backdrop ${articleSidebarOpen ? "is-open" : ""}`} type="button" onClick={() => setArticleSidebarOpen(false)} aria-label="Artikelnavigation schließen" tabIndex={articleSidebarOpen ? 0 : -1} />
+      <aside id="article-sidebar" className={`article-sidebar ${articleSidebarOpen ? "is-open" : ""}`} aria-label="Alle Grundgesetz-Artikel" aria-describedby="article-sidebar-intro">
+        <div className="article-sidebar-top"><span className="section-kicker">Schritt für Schritt</span><strong>Alle Artikel</strong><button ref={articleSidebarCloseRef} type="button" className="article-sidebar-close" onClick={() => setArticleSidebarOpen(false)} aria-label="Artikelnavigation schließen"><X size={16} /></button></div>
+        <p id="article-sidebar-intro" className="article-sidebar-intro">Wähle einen Artikel aus. Die KI erklärt Zweck, Begriffe und Grenzen in verständlicher Sprache.</p>
         <div className="article-stepper"><button type="button" onClick={() => moveArticle(-1)} disabled={selectedArticle.id === articleCatalog[0].id} aria-label="Vorheriger Artikel">←</button><span>{selectedArticle.label} · {articleCatalog.findIndex(article => article.id === selectedArticle.id) + 1}/{articleCatalog.length}</span><button type="button" onClick={() => moveArticle(1)} disabled={selectedArticle.id === articleCatalog.at(-1)?.id} aria-label="Nächster Artikel">→</button></div>
         <div className="article-list">
           {articleSections.map(section => <div className="article-group" key={section}><span className="article-group-title">{section}</span>{articleCatalog.filter(article => article.section === section).map(article => <button type="button" className={`article-item ${selectedArticle.id === article.id ? "is-selected" : ""} ${article.fallen ? "is-fallen" : ""}`} key={article.id} onClick={() => explainArticle(article)}><span>{article.label}</span><em>{article.fallen ? "weggefallen" : article.title}</em></button>)}</div>)}

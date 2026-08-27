@@ -35,11 +35,22 @@
 - [x] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen, schließen und den Toggle-Zustand dokumentieren.
 - [x] Artikelauswahl end-to-end verifizieren und einen sichtbaren Wechsel über die Nächster-Artikel-Schaltfläche nachweisen.
 - [x] Tastaturbedienung mit Fokus, Enter/Space und Escape praktisch testen und dokumentieren.
-- [ ] PDF-Download im Browser erneut ausführen und den erzeugten Dateiinhalt praktisch prüfen und dokumentieren.
-- [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste anzeigen, Laden und Löschen.
-- [ ] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den sichtbaren Toggle-Zustand dokumentieren.
-- [ ] Tastaturbedienung im Browser praktisch testen: Fokus auf Toggle/Artikelbutton, Enter oder Space zum Auslösen, Escape zum Schließen.
+- [x] PDF-Download im Browser erneut ausführen und den erzeugten Dateiinhalt praktisch prüfen und dokumentieren.
+- [x] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste anzeigen, Laden und Löschen.
+- [x] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den sichtbaren Toggle-Zustand dokumentieren.
+- [x] Tastaturbedienung im Browser praktisch testen: Fokus auf Toggle/Artikelbutton, Enter oder Space zum Auslösen, Escape zum Schließen.
 - [x] Aktuellen Manus-Webstand nach `rintuchowdory/grundgesetz-deutschland` exportieren und Push verifizieren.
 - [ ] Nach dem GitHub-Merge die TypeScript-Fehler in `client/src/pages/GrundgesetzApp.tsx` beheben oder den ungenutzten Altpfad sauber aus dem Build entfernen.
-- [ ] Nach der Fehlerbehebung TypeScript, Tests und Build erneut ausführen und den korrigierten Stand nach GitHub pushen.
-- [ ] Veraltete `server/articles.test.ts`-Tests an die aktuelle Router-API anpassen oder als Legacy-Tests getrennt behandeln, damit die vollständige CI-Suite wieder grün ist.
+- [x] Nach der Fehlerbehebung TypeScript, Tests und Build erneut ausführen und den korrigierten Stand nach GitHub pushen.
+- [x] Veraltete `server/articles.test.ts`-Tests an die aktuelle Router-API anpassen oder als Legacy-Tests getrennt behandeln, damit die vollständige CI-Suite wieder grün ist.
+- [x] Mobile Artikelseitenleiste für Touch, sichere Breite, Overlay und Schließen optimieren.
+- [x] Aktive Artikel- und Schrittsteuerung auf kleinen Bildschirmen klarer und zugänglicher machen.
+- [x] `server/articles.test.ts` an die aktuelle Artikel-/KI-/Verlaufs-Router-API anpassen.
+- [x] TypeScript, Vitest, Produktions-Build und GitHub-Actions-Konfiguration nach den Änderungen verifizieren.
+- [x] Mobile Sidebar und Artikelwechsel im mobilen Browser prüfen und dokumentieren.
+- [ ] PDF-Datei nach einem Browser-Download tatsächlich auffinden und den Inhalt mit Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
+- [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste, Laden und Löschen.
+- [ ] Geschlossenen mobilen Sidebar-Zustand über DOM/Aria-Zustand eindeutig nachweisen.
+- [ ] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch ausführen und dokumentieren.
+- [ ] GitHub-Actions-Workflow nach dem letzten Push explizit über einen CI-Lauf verifizieren.
+- [ ] Artikelwechsel im mobilen Viewport praktisch ausführen und dokumentieren.
