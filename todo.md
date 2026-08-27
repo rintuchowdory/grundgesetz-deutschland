@@ -50,12 +50,12 @@
 - [x] Mobile Sidebar und Artikelwechsel im mobilen Browser prüfen und dokumentieren.
 - [x] PDF-Datei nach einem Browser-Download tatsächlich auffinden und den Inhalt mit Frage, Antwort sowie Quellen-/Haftungshinweis prüfen.
 - [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste, Laden und Löschen.
-- [ ] Geschlossenen mobilen Sidebar-Zustand über DOM/Aria-Zustand eindeutig nachweisen.
-- [ ] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch ausführen und dokumentieren.
+- [x] Geschlossenen mobilen Sidebar-Zustand über DOM/Aria-Zustand eindeutig nachweisen.
+- [x] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch ausführen und dokumentieren.
 - [x] GitHub-Actions-Workflow nach dem letzten Push explizit über einen CI-Lauf verifizieren.
 - [x] Artikelwechsel im mobilen Viewport praktisch ausführen und dokumentieren.
 - [x] GitHub-Actions-Fehler `Unable to locate executable file: pnpm` durch korrekte Reihenfolge von pnpm/action-setup und setup-node beheben und CI erneut ausführen.
-- [ ] PDF-Export über den UI-Button im Browser auslösen, die tatsächlich heruntergeladene Datei identifizieren und ihren Inhalt prüfen.
+- [x] PDF-Export über den UI-Button im Browser auslösen, die tatsächlich heruntergeladene Datei identifizieren und ihren Inhalt prüfen.
 - [ ] Letzte lokale Updates prüfen und nach `rintuchowdory/grundgesetz-deutschland` pushen.
 - [ ] Manus-Projekt neu prüfen, Checkpoint für die Subdomain-Aktualisierung erstellen und Publish-Schritt vorbereiten.
 - [x] Ladeanimation mit Statusanzeige für die laufende Artikel-KI-Erklärung ergänzen.
@@ -64,3 +64,9 @@
 - [x] Ladezustand der Artikel-KI im Browser auf Desktop und Mobil praktisch auslösen und den sichtbaren Tipp-/Status-Effekt dokumentieren.
 - [x] Fehlerpfad nach dem Loader-Update im Browser mit ungültiger Eingabe oder API-Fehler testen und dokumentieren.
 - [x] Abgeschlossene Artikel-Erklärung nach dem Laden auf Desktop und Mobil praktisch verifizieren und dokumentieren.
+- [x] Dark-Mode-Zustand mit lokaler Persistenz und Systemstandard definieren.
+- [x] Sichtbaren, zugänglichen Theme-Schalter im Header für Desktop und Mobilgerät ergänzen.
+- [x] Papier-, Text-, Karten-, Sidebar- und KI-Antwortfarben für dunkle Umgebung optimieren.
+- [x] Theme-Wechsel, Lesbarkeit, Persistenz, reduzierte Bewegung und Build verifizieren.
+- [x] Im Browser einen fokussierten Button zusätzlich mit der Leertaste auslösen und den sichtbaren Zustandswechsel dokumentieren.
+- [x] Escape-Schließen der Artikelnavigation im Browser mit eindeutigem sichtbaren oder DOM-/ARIA-seitigen Zustandswechsel dokumentieren.

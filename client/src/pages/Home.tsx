@@ -9,7 +9,9 @@ import {
   ChevronDown,
   CircleHelp,
   Menu,
+  Moon,
   Scale,
+  Sun,
   Search,
   ShieldCheck,
   Sparkles,
@@ -18,6 +20,7 @@ import {
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Streamdown } from "streamdown";
 import { trpc } from "@/lib/trpc";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { downloadConversationPdf } from "@/lib/conversation-export";
@@ -89,6 +92,7 @@ export default function Home() {
   const [localHistory, setLocalHistory] = useState<Array<{ title: string; messages: ChatMessage[]; savedAt: string }>>([]);
   const articleSidebarCloseRef = useRef<HTMLButtonElement>(null);
   const { isAuthenticated, user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const historyQuery = trpc.history.list.useQuery(undefined, { enabled: isAuthenticated });
   const saveHistoryMutation = trpc.history.save.useMutation({
     onSuccess: () => {
@@ -285,6 +289,7 @@ export default function Home() {
         </nav>
         <div className="header-actions">
           <a className="header-link" href="#hinweis">Nutzungshinweis <ArrowUpRight size={15} strokeWidth={1.8} /></a>
+          <button className="theme-toggle" type="button" onClick={() => toggleTheme?.()} aria-pressed={theme === "dark"} aria-label={theme === "dark" ? "Helles Design aktivieren" : "Dunkles Design aktivieren"}><span className="theme-toggle-mark" aria-hidden="true">{theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}</span><span>{theme === "dark" ? "Hell" : "Dunkel"}</span></button>
           {isAuthenticated ? <span className="header-user">{user?.name || "Angemeldet"}</span> : <button className="login-link" type="button" onClick={() => startLogin()}>Anmelden <ArrowUpRight size={15} strokeWidth={1.8} /></button>}
           <button className="menu-button" type="button" aria-label={mobileMenuOpen ? "Menü schließen" : "Menü öffnen"} onClick={() => setMobileMenuOpen((open) => !open)}>
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}

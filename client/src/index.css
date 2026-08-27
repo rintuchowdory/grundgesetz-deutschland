@@ -23,6 +23,20 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+.dark {
+  --paper: #101923;
+  --paper-bright: #182633;
+  --paper-deep: #233441;
+  --ink: #eef3f4;
+  --navy: #0a1724;
+  --navy-soft: #c8d5dc;
+  --red: #e27b68;
+  --red-dark: #f0a08d;
+  --brass: #e0bc73;
+  --muted: #aebbc1;
+  --line: rgba(220, 232, 238, .2);
+}
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -31,7 +45,52 @@ body {
   color: var(--ink);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 180ms var(--ease-out), color 180ms var(--ease-out);
 }
+
+.dark .hero-lede,
+.dark .section-intro p,
+.dark .source-intro p,
+.dark .about-text,
+.dark .notice-section p,
+.dark .card-question,
+.dark .form-note,
+.dark .article-sidebar-intro { color: #b7c4ca; }
+.dark h1,
+.dark h2,
+.dark .brand-wordmark strong,
+.dark .main-nav a,
+.dark .header-link,
+.dark .login-link,
+.dark .article-sidebar-top strong,
+.dark .article-item,
+.dark .article-stepper,
+.dark .example-card strong,
+.dark .card-action,
+.dark .source-step strong,
+.dark .about-copy h2,
+.dark .notice-section h2 { color: var(--ink); }
+.dark .site-header,
+.dark .article-sidebar,
+.dark .article-stepper,
+.dark .example-card,
+.dark .question-input-wrap { border-color: rgba(220, 232, 238, .26); }
+.dark .article-sidebar,
+.dark .example-card,
+.dark .question-input-wrap { background: var(--paper-bright); }
+.dark .article-item:hover,
+.dark .article-item.is-selected { background: rgba(226, 123, 104, .14); }
+.dark .example-card:hover,
+.dark .example-card.is-active { background: #203342; }
+.dark .article-item em,
+.dark .article-item.is-fallen em { color: #aab8be; }
+.dark .question-input-wrap input { color: var(--ink); }
+.dark .question-input-wrap input::placeholder { color: #91a1a9; }
+.dark .about-text a,
+.dark .article-source-link,
+.dark .footer-links a { color: var(--red-dark); }
+.dark .site-footer { border-color: var(--line); }
+
 button, input { font: inherit; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
@@ -59,6 +118,13 @@ a { color: inherit; text-decoration: none; }
 .login-link { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; padding: 0; color: var(--navy-soft); font-size: 11px; font-weight: 600; }
 .login-link:hover { color: var(--red-dark); }
 .header-user { color: var(--red-dark); font: 500 10px var(--mono); }
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; border: 1px solid var(--line); background: transparent; padding: 6px 9px; color: var(--navy-soft); font: 10px var(--mono); letter-spacing: .04em; transition: border-color 180ms var(--ease-out), color 180ms var(--ease-out), background 180ms var(--ease-out); }
+.theme-toggle:hover { border-color: var(--red); color: var(--red-dark); background: rgba(184,74,58,.06); }
+.theme-toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.theme-toggle-mark { display: inline-flex; color: var(--red-dark); }
+.dark .theme-toggle { border-color: rgba(220,232,238,.3); color: #d7e2e6; }
+.dark .theme-toggle:hover { background: rgba(226,123,104,.1); }
+
 .menu-button { display: none; border: 0; background: transparent; color: var(--navy); padding: 4px; }
 .article-sidebar { position: fixed; z-index: 30; top: 128px; bottom: 24px; left: 0; display: flex; width: 292px; flex-direction: column; border-right: 1px solid rgba(24,50,75,.2); background: rgba(244,240,232,.98); padding: 24px 16px 18px 22px; box-shadow: 12px 0 30px rgba(24,50,75,.06); overscroll-behavior: contain; transform: translateX(-100%); transition: transform 220ms var(--ease-out); }
 .article-sidebar.is-open { transform: translateX(0); }
@@ -293,6 +359,8 @@ h2 i { color: var(--red); font-weight: 500; }
   .topline-status { white-space: nowrap; }
   .site-header { padding-top: 17px; padding-bottom: 17px; }
   .menu-button { display: block; }
+  .theme-toggle { min-width: 36px; width: 36px; height: 36px; padding: 0; }
+  .theme-toggle > span:last-child { display: none; }
   .main-nav { position: absolute; top: 100%; right: 6vw; left: 6vw; display: none; flex-direction: column; align-items: flex-start; gap: 0; margin: 0; border: 1px solid var(--line); border-top: 2px solid var(--red); padding: 8px 18px; background: var(--paper-bright); box-shadow: 0 16px 28px rgba(24,50,75,.1); }
   .main-nav.is-open { display: flex; }
   .main-nav a { width: 100%; border-bottom: 1px solid var(--line); padding: 15px 0; }
