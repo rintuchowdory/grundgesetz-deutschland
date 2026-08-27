@@ -39,4 +39,7 @@
 - [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste anzeigen, Laden und Löschen.
 - [ ] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den sichtbaren Toggle-Zustand dokumentieren.
 - [ ] Tastaturbedienung im Browser praktisch testen: Fokus auf Toggle/Artikelbutton, Enter oder Space zum Auslösen, Escape zum Schließen.
-- [ ] Aktuellen Manus-Webstand nach `rintuchowdory/grundgesetz-deutschland` exportieren und Push verifizieren.
+- [x] Aktuellen Manus-Webstand nach `rintuchowdory/grundgesetz-deutschland` exportieren und Push verifizieren.
+- [ ] Nach dem GitHub-Merge die TypeScript-Fehler in `client/src/pages/GrundgesetzApp.tsx` beheben oder den ungenutzten Altpfad sauber aus dem Build entfernen.
+- [ ] Nach der Fehlerbehebung TypeScript, Tests und Build erneut ausführen und den korrigierten Stand nach GitHub pushen.
+- [ ] Veraltete `server/articles.test.ts`-Tests an die aktuelle Router-API anpassen oder als Legacy-Tests getrennt behandeln, damit die vollständige CI-Suite wieder grün ist.
