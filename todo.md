@@ -40,7 +40,7 @@
 - [x] Mobile Sidebar in einem echten mobilen Browser-Viewport interaktiv öffnen und schließen und den sichtbaren Toggle-Zustand dokumentieren.
 - [x] Tastaturbedienung im Browser praktisch testen: Fokus auf Toggle/Artikelbutton, Enter oder Space zum Auslösen, Escape zum Schließen.
 - [x] Aktuellen Manus-Webstand nach `rintuchowdory/grundgesetz-deutschland` exportieren und Push verifizieren.
-- [ ] Nach dem GitHub-Merge die TypeScript-Fehler in `client/src/pages/GrundgesetzApp.tsx` beheben oder den ungenutzten Altpfad sauber aus dem Build entfernen.
+- [x] Nach dem GitHub-Merge die TypeScript-Fehler in `client/src/pages/GrundgesetzApp.tsx` beheben oder den ungenutzten Altpfad sauber aus dem Build entfernen.
 - [x] Nach der Fehlerbehebung TypeScript, Tests und Build erneut ausführen und den korrigierten Stand nach GitHub pushen.
 - [x] Veraltete `server/articles.test.ts`-Tests an die aktuelle Router-API anpassen oder als Legacy-Tests getrennt behandeln, damit die vollständige CI-Suite wieder grün ist.
 - [x] Mobile Artikelseitenleiste für Touch, sichere Breite, Overlay und Schließen optimieren.
@@ -52,6 +52,6 @@
 - [ ] Mit echtem Login den serverseitigen Verlauf im Browser end-to-end testen: Speichern, Liste, Laden und Löschen.
 - [ ] Geschlossenen mobilen Sidebar-Zustand über DOM/Aria-Zustand eindeutig nachweisen.
 - [ ] Tastaturbedienung im Browser mit Fokus, Enter/Space und Escape praktisch ausführen und dokumentieren.
-- [ ] GitHub-Actions-Workflow nach dem letzten Push explizit über einen CI-Lauf verifizieren.
+- [x] GitHub-Actions-Workflow nach dem letzten Push explizit über einen CI-Lauf verifizieren.
 - [ ] Artikelwechsel im mobilen Viewport praktisch ausführen und dokumentieren.
-- [ ] GitHub-Actions-Fehler `Unable to locate executable file: pnpm` durch korrekte Reihenfolge von pnpm/action-setup und setup-node beheben und CI erneut ausführen.
+- [x] GitHub-Actions-Fehler `Unable to locate executable file: pnpm` durch korrekte Reihenfolge von pnpm/action-setup und setup-node beheben und CI erneut ausführen.
