@@ -58,3 +58,9 @@
 - [ ] PDF-Export über den UI-Button im Browser auslösen, die tatsächlich heruntergeladene Datei identifizieren und ihren Inhalt prüfen.
 - [ ] Letzte lokale Updates prüfen und nach `rintuchowdory/grundgesetz-deutschland` pushen.
 - [ ] Manus-Projekt neu prüfen, Checkpoint für die Subdomain-Aktualisierung erstellen und Publish-Schritt vorbereiten.
+- [x] Ladeanimation mit Statusanzeige für die laufende Artikel-KI-Erklärung ergänzen.
+- [x] Dezenten Tipp-Effekt für die Antwortgenerierung mit `prefers-reduced-motion`-Fallback implementieren.
+- [x] Lade-, Antwort- und Fehlerzustände auf Desktop und Mobilgerät testen und dokumentieren.
+- [x] Ladezustand der Artikel-KI im Browser auf Desktop und Mobil praktisch auslösen und den sichtbaren Tipp-/Status-Effekt dokumentieren.
+- [x] Fehlerpfad nach dem Loader-Update im Browser mit ungültiger Eingabe oder API-Fehler testen und dokumentieren.
+- [x] Abgeschlossene Artikel-Erklärung nach dem Laden auf Desktop und Mobil praktisch verifizieren und dokumentieren.

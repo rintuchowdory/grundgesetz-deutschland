@@ -82,6 +82,7 @@ export default function Home() {
   const [aiAnswer, setAiAnswer] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState("");
   const [localError, setLocalError] = useState("");
+  const [loadingHintIndex, setLoadingHintIndex] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [saveNotice, setSaveNotice] = useState("");
   const [selectedHistoryId, setSelectedHistoryId] = useState<number | null>(null);
@@ -159,6 +160,18 @@ export default function Home() {
       setLocalError(error.message);
     },
   });
+
+  useEffect(() => {
+    if (!askMutation.isPending) {
+      setLoadingHintIndex(0);
+      return;
+    }
+    const hints = ["Wortlaut wird gelesen", "Begriffe werden geordnet", "Grenzen werden markiert"];
+    const timer = window.setInterval(() => {
+      setLoadingHintIndex(current => (current + 1) % hints.length);
+    }, 1200);
+    return () => window.clearInterval(timer);
+  }, [askMutation.isPending]);
 
   const scrollToAnswer = () => {
     window.setTimeout(() => {
@@ -349,7 +362,13 @@ export default function Home() {
           <article className="answer-card">
             <div className="answer-card-top"><span>{aiAnswer ? "Live-Antwort · Manus LLM" : answer.article}</span><span className="answer-type"><Sparkles size={14} /> {aiAnswer ? "serverseitig geschützt" : "Beispiel-Einordnung"}</span></div>
             {askMutation.isPending ? (
-              <div className="answer-loading" role="status"><span className="loading-pulse" /> Deine Frage wird eingeordnet …</div>
+              <div className="answer-loading" role="status" aria-live="polite" aria-label="Die KI erstellt eine Erklärung">
+                <span className="loading-pulse" aria-hidden="true" />
+                <span className="thinking-copy">
+                  <strong>{["Wortlaut wird gelesen", "Begriffe werden geordnet", "Grenzen werden markiert"][loadingHintIndex]}</strong>
+                  <span className="typing-dots" aria-hidden="true"><i /> <i /> <i /></span>
+                </span>
+              </div>
             ) : aiAnswer ? (
               <div className="ai-answer-markdown"><Streamdown>{aiAnswer}</Streamdown></div>
             ) : (
