@@ -130,3 +130,51 @@ describe("Auth Router", () => {
     await expect(caller.auth.me()).resolves.toBeNull();
   });
 });
+
+describe("Comparison Router", () => {
+  beforeEach(() => {
+    invokeLLM.mockReset();
+    invokeLLM.mockResolvedValue({
+      choices: [{ message: { role: "assistant", content: "## Gemeinsamkeiten\nBeide Artikel schützen Grundrechte.\n\n## Unterschiede\nDie Schutzrichtungen unterscheiden sich.\n\n## Quellen und Grenze\nAmtlichen Wortlaut prüfen." } }],
+    });
+  });
+
+  it("vergleicht zwei validierte Artikel serverseitig ohne freien Artikeltext", async () => {
+    const caller = appRouter.createCaller(createMockContext(null, "compare-success-unique"));
+    const result = await caller.compare.articles({
+      left: { id: "5", label: "Art. 5" },
+      right: { id: "3", label: "Art. 3" },
+    });
+
+    expect(result.articles).toHaveLength(2);
+    expect(result.explanation).toContain("Gemeinsamkeiten");
+    const prompt = invokeLLM.mock.calls[0]?.[0].messages[1];
+    expect(prompt).toMatchObject({ role: "user" });
+    expect(String(prompt?.content)).toContain("Art. 5");
+    expect(String(prompt?.content)).not.toContain("persoenliche");
+  });
+
+  it("weist identische oder ungültige Artikel sicher zurück", async () => {
+    const caller = appRouter.createCaller(createMockContext(null, "compare-validation-unique"));
+    await expect(caller.compare.articles({ left: { id: "5", label: "Art. 5" }, right: { id: "5", label: "Art. 5" } })).rejects.toThrow();
+    await expect(caller.compare.articles({ left: { id: "javascript", label: "Art. 5" }, right: { id: "3", label: "Art. 3" } })).rejects.toThrow();
+    expect(invokeLLM).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("Privacy minimization", () => {
+  it("redigiert E-Mail- und Telefonnummern vor der Verlaufsspeicherung", async () => {
+    dbMocks.createConversation.mockResolvedValue(8);
+    const caller = appRouter.createCaller(createMockContext(mockUser, "privacy-minimization-unique"));
+    await caller.history.save({
+      title: "Kontakt test@example.com",
+      messages: [{ role: "user", content: "Rückruf unter +491701234567 oder test@example.com" }],
+    });
+    expect(dbMocks.createConversation).toHaveBeenCalledWith(
+      mockUser.id,
+      "Kontakt [E-Mail redigiert]",
+      [{ role: "user", content: "Rückruf unter [Telefonnummer redigiert] oder [E-Mail redigiert]" }],
+    );
+  });
+});
