@@ -25,10 +25,12 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { downloadConversationPdf } from "@/lib/conversation-export";
 import { articleCatalog, articleSections, officialGrundgesetzUrl, type ArticleEntry } from "@/lib/article-catalog";
+import { getArticleSource, getArticleSourceUrl, supportedSourceIds } from "@shared/article-sources";
 
 const heroImage = "/manus-storage/verfassungsblatt-hero_52fa1064.png";
 const archiveImage = "/manus-storage/verfassungsblatt-archive_d78ab496.png";
 const sourceImage = "/manus-storage/verfassungsblatt-source_7552d79d.png";
+const compareArticles = articleCatalog.filter(article => supportedSourceIds.includes(article.id as typeof supportedSourceIds[number]));
 const markImage = "/manus-storage/verfassungsblatt-mark.svg_0a001e3e.png";
 
 const examples = [
@@ -81,6 +83,9 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [articleSidebarOpen, setArticleSidebarOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<ArticleEntry>(articleCatalog[0]);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareLeftId, setCompareLeftId] = useState(compareArticles[0]?.id || "5");
+  const [compareRightId, setCompareRightId] = useState(compareArticles[1]?.id || "3");
   const [hasSearched, setHasSearched] = useState(false);
   const [aiAnswer, setAiAnswer] = useState<string | null>(null);
   const [aiQuestion, setAiQuestion] = useState("");
@@ -153,6 +158,8 @@ export default function Home() {
     setHasSearched(true);
     setSaveNotice("Gespeicherte Unterhaltung geladen.");
   }, [loadedHistoryQuery.data]);
+  const compareMutation = trpc.compare.articles.useMutation();
+
   const askMutation = trpc.ai.ask.useMutation({
     onSuccess: (data) => {
       setAiAnswer(data.answer);
@@ -226,6 +233,12 @@ export default function Home() {
     setSaveNotice("");
   };
 
+  const clearLocalHistory = () => {
+    localStorage.removeItem("grundgesetz-chat-latest");
+    setLocalHistory([]);
+    setSaveNotice("Lokaler Verlauf wurde aus diesem Browser gelöscht.");
+  };
+
   const loadLocalConversation = (saved: { title: string; messages: ChatMessage[] }) => {
     const lastQuestion = [...saved.messages].reverse().find(message => message.role === "user");
     const lastAnswer = [...saved.messages].reverse().find(message => message.role === "assistant");
@@ -234,6 +247,19 @@ export default function Home() {
     setAiAnswer(lastAnswer?.content || null);
     setHasSearched(true);
     setSaveNotice("Lokale Unterhaltung geladen.");
+  };
+
+  const getArticleById = (id: string) => articleCatalog.find(article => article.id === id) || articleCatalog[0];
+
+  const runComparison = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const left = getArticleById(compareLeftId);
+    const right = getArticleById(compareRightId);
+    if (left.id === right.id) return;
+    compareMutation.mutate({
+      left: { id: left.id, label: left.label },
+      right: { id: right.id, label: right.label },
+    });
   };
 
   const explainArticle = (article: ArticleEntry) => {
@@ -289,6 +315,7 @@ export default function Home() {
         </nav>
         <div className="header-actions">
           <a className="header-link" href="#hinweis">Nutzungshinweis <ArrowUpRight size={15} strokeWidth={1.8} /></a>
+          <button className="header-link comparison-trigger" type="button" onClick={() => setCompareMode(mode => !mode)} aria-pressed={compareMode}>{compareMode ? "Vergleich schließen" : "Artikel vergleichen"}</button>
           <button className="theme-toggle" type="button" onClick={() => toggleTheme?.()} aria-pressed={theme === "dark"} aria-label={theme === "dark" ? "Helles Design aktivieren" : "Dunkles Design aktivieren"}><span className="theme-toggle-mark" aria-hidden="true">{theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}</span><span>{theme === "dark" ? "Hell" : "Dunkel"}</span></button>
           {isAuthenticated ? <span className="header-user">{user?.name || "Angemeldet"}</span> : <button className="login-link" type="button" onClick={() => startLogin()}>Anmelden <ArrowUpRight size={15} strokeWidth={1.8} /></button>}
           <button className="menu-button" type="button" aria-label={mobileMenuOpen ? "Menü schließen" : "Menü öffnen"} onClick={() => setMobileMenuOpen((open) => !open)}>
@@ -308,6 +335,28 @@ export default function Home() {
         </div>
         <a className="article-source-link" href={officialGrundgesetzUrl} target="_blank" rel="noreferrer">Amtlichen Wortlaut öffnen <ArrowUpRight size={14} /></a>
       </aside>
+
+      {compareMode && (
+        <section className="comparison-section" id="vergleich" aria-labelledby="comparison-title">
+          <div className="comparison-heading"><span className="section-kicker">Parallellesen</span><h2 id="comparison-title">Zwei Artikel.<br /><i>Ein Maßstab.</i></h2><p>Vergleiche den amtlichen Bezug und eine vorsichtige KI-Einordnung nebeneinander. Es werden nur ausgewählte Artikel-IDs und kurze Quellen-Auszüge verarbeitet.</p></div>
+          <form className="comparison-controls" onSubmit={runComparison}>
+            <label>Artikel A<select value={compareLeftId} onChange={event => setCompareLeftId(event.target.value)} aria-label="Erster Vergleichsartikel">{compareArticles.map(article => <option key={`left-${article.id}`} value={article.id}>{article.label} · {article.title}</option>)}</select></label>
+            <span className="comparison-vs" aria-hidden="true">vs.</span>
+            <label>Artikel B<select value={compareRightId} onChange={event => setCompareRightId(event.target.value)} aria-label="Zweiter Vergleichsartikel">{compareArticles.map(article => <option key={`right-${article.id}`} value={article.id}>{article.label} · {article.title}</option>)}</select></label>
+            <button type="submit" disabled={compareMutation.isPending || compareLeftId === compareRightId}>{compareMutation.isPending ? "Vergleich wird erstellt …" : "Artikel vergleichen"}<ArrowUpRight size={16} /></button>
+          </form>
+          {compareLeftId === compareRightId && <p className="form-error" role="alert">Bitte wähle zwei unterschiedliche Artikel.</p>}
+          {compareMutation.error && <p className="form-error" role="alert">{compareMutation.error.message}</p>}
+          <div className="comparison-grid">
+            {[compareLeftId, compareRightId].map((id, index) => {
+              const article = getArticleById(id);
+              const source = getArticleSource(article.id, article.label);
+              return <article className="comparison-pane" key={`${article.id}-${index}`}><div className="comparison-pane-top"><span>{index === 0 ? "Artikel A" : "Artikel B"}</span><strong>{article.label}</strong></div><h3>{article.title}</h3><p className="comparison-source-label">Amtlicher Wortlaut · Auszug</p><blockquote>{source.text}</blockquote><a href={getArticleSourceUrl(article.id)} target="_blank" rel="noreferrer">Quelle öffnen <ArrowUpRight size={14} /></a></article>;
+            })}
+          </div>
+          {compareMutation.data && <div className="comparison-ai"><div className="answer-card-top"><span>Vergleichende Einordnung · Manus LLM</span><span className="answer-type"><Sparkles size={14} /> serverseitig geschützt</span></div><Streamdown>{compareMutation.data.explanation}</Streamdown><p className="form-note"><span className="red-line" /> Nur Orientierung, keine Rechtsberatung. Der vollständige amtliche Wortlaut ist maßgeblich.</p></div>}
+        </section>
+      )}
 
       <section className="hero" id="start">
         <div className="hero-copy">
@@ -403,6 +452,7 @@ export default function Home() {
               <div className="history-panel-heading"><span className="section-kicker">Dieser Browser</span><strong>Lokaler Verlauf</strong></div>
               {localHistory.map((item, index) => <button className="local-history-button" type="button" key={`${item.savedAt}-${index}`} onClick={() => loadLocalConversation(item)}>{item.title}</button>)}
               <p className="history-loaded">Lokal gespeichert; nur auf diesem Gerät sichtbar.</p>
+              <button className="history-clear-button" type="button" onClick={clearLocalHistory}>Lokalen Verlauf löschen</button>
             </aside>
           )}
           {isAuthenticated && historyQuery.data && historyQuery.data.length > 0 && (
@@ -449,7 +499,7 @@ export default function Home() {
       <section className="notice-section" id="hinweis">
         <div className="notice-icon"><ShieldCheck size={24} strokeWidth={1.4} /></div>
         <div><span className="section-kicker">Hinweis zur Nutzung</span><h2>Orientierung ersetzt<br /><i>keine Beratung.</i></h2></div>
-        <p>Die Anwendung ist ein Recherchewerkzeug. KI-generierte Antworten können Fehler enthalten, sind nicht verbindlich und sollten immer mit dem aktuellen amtlichen Gesetzestext abgeglichen werden. Bitte gib keine vertraulichen oder personenbezogenen Informationen ein.</p>
+            <p>Die Anwendung ist ein Recherchewerkzeug. KI-generierte Antworten können Fehler enthalten, sind nicht verbindlich und sollten immer mit dem aktuellen amtlichen Gesetzestext abgeglichen werden. Fragen werden zur Antwortgenerierung an den serverseitigen KI-Dienst übermittelt; gib keine vertraulichen oder personenbezogenen Informationen ein. Lokale Verläufe bleiben in deinem Browser und können dort gelöscht werden. Angemeldete Verläufe sind deinem Konto zugeordnet und über die Löschaktion entfernbar.</p>
       </section>
 
       <footer className="site-footer">
