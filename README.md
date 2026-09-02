@@ -40,3 +40,15 @@ Die automatisch bereitgestellten Manus-Umgebungsvariablen werden serverseitig in
 ## Lizenz
 
 Dokumentation und ausdrücklich gekennzeichnete Originalinhalte stehen unter CC BY-NC-ND 4.0. Für kontrollierte Originalinhalte gilt zusätzlich die `NO-AI-POLICY.md`. Der Quellcode kann eigene Lizenzhinweise und die Lizenzen seiner Abhängigkeiten enthalten.
+
+## Datenschutz
+
+Die Anwendung verarbeitet Fragen für die Antwortgenerierung über den serverseitigen `ai.ask`-Endpunkt. Geheimnisse und API-Schlüssel bleiben im Serverprozess; der Client erhält nur die Antwort. Der Vergleichsmodus verwendet ausschließlich validierte Artikel-IDs, Bezeichnungen und kurze, fest im Projekt hinterlegte Quellen-Auszüge. Freie Artikeltexte werden nicht als Vergleichseingabe akzeptiert.
+
+Angemeldete Verläufe werden ausschließlich über die authentifizierte Nutzer-ID gelesen, gespeichert und gelöscht. Nicht angemeldete lokale Verläufe liegen nur im `localStorage` des jeweiligen Browsers und können über „Lokalen Verlauf löschen“ entfernt werden. Die Anwendung setzt für API-Antworten `Cache-Control: no-store`, `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` und eine restriktive `Permissions-Policy`.
+
+Bitte gib niemals besondere Kategorien personenbezogener Daten, Zugangsdaten, Gesundheitsdaten oder vertrauliche Mandats-/Geschäftsinformationen ein. Browser- und Infrastruktur-Logs können technische Metadaten enthalten; produktive Log-Retention und Auftragsverarbeitung müssen durch den jeweiligen Hosting-/KI-Dienst geprüft und vertraglich geregelt werden. Diese Hinweise ersetzen keine individuelle Datenschutzprüfung oder Datenschutzerklärung.
+
+## Vergleichsmodus
+
+Über „Artikel vergleichen“ lassen sich zwei unterschiedliche Artikel, Buchstabenartikel oder weggefallene Einträge auswählen. Die Oberfläche zeigt beide Artikel nebeneinander, verlinkt auf die amtliche Grundgesetz-Quelle und bietet anschließend eine serverseitige KI-Einordnung mit Gemeinsamkeiten, Unterschieden, Schutzrichtung sowie Grenzen. Für nicht hinterlegte Artikel wird ausdrücklich auf den vollständigen amtlichen Wortlaut verwiesen. Vergleichsergebnisse werden nicht automatisch im persönlichen Verlauf gespeichert.
