@@ -35,9 +35,11 @@ async function startServer() {
   app.use((_req, res, next) => {
     res.setHeader("Referrer-Policy", "no-referrer");
     res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     next();
+  });
+  app.get("/healthz", (_req, res) => {
+    res.status(200).json({ ok: true });
   });
   app.use("/api", (_req, res, next) => {
     res.setHeader("Cache-Control", "no-store");

@@ -27,11 +27,11 @@ import { downloadConversationPdf } from "@/lib/conversation-export";
 import { articleCatalog, articleSections, officialGrundgesetzUrl, type ArticleEntry } from "@/lib/article-catalog";
 import { getArticleSource, getArticleSourceUrl, supportedSourceIds } from "@shared/article-sources";
 
-const heroImage = "/manus-storage/verfassungsblatt-hero_52fa1064.png";
-const archiveImage = "/manus-storage/verfassungsblatt-archive_d78ab496.png";
-const sourceImage = "/manus-storage/verfassungsblatt-source_7552d79d.png";
+const heroImage = "/manus-storage/async-images/OpZwyZALtUaeEdsGglaIvo/image-1.webp";
+const archiveImage = "/manus-storage/async-images/OpZwyZALtUaeEdsGglaIvo/image-2.webp";
+const sourceImage = "/manus-storage/async-images/OpZwyZALtUaeEdsGglaIvo/image-3.webp";
 const compareArticles = articleCatalog.filter(article => supportedSourceIds.includes(article.id as typeof supportedSourceIds[number]));
-const markImage = "/manus-storage/verfassungsblatt-mark.svg_0a001e3e.png";
+const markImage = "/favicon.svg";
 
 const examples = [
   {
